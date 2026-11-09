@@ -1,0 +1,27 @@
+package com.Auth.AuthModule.DTO.Response;
+
+import com.Auth.AuthModule.Entity.Role;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class RegisterResponse {
+
+    private UUID id;
+    private String email;
+    private Role role;
+
+    @Builder.Default
+    private String tokenType = "Bearer";
+
+    private String accessToken;
+    private String refreshToken;
+    private Long ExpiresInSec;
+}

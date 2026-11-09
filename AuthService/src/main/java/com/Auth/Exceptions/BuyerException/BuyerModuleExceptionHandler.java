@@ -1,0 +1,33 @@
+package com.Auth.Exceptions.BuyerException;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice(basePackages = "com.miniProject.AeroScale.BuyerModule")
+public class BuyerModuleExceptionHandler {
+
+    @ExceptionHandler(CartItemNotFoundException.class)
+    public ResponseEntity<?> cartItemNotFoundException(CartItemNotFoundException cartItemNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(cartItemNotFoundException.getMessage());
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<?> insufficientStockException(InsufficientStockException insufficientStockException) {
+        return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE.value()).body(insufficientStockException.getMessage());
+    }
+
+    @ExceptionHandler(RequiredThingsNotFoundException.class)
+    public ResponseEntity<?> requiredThingsNotFound(RequiredThingsNotFoundException requiredThingsNotFoundException) {
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED.value()).body(requiredThingsNotFoundException.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(ex.getMessage());
+    }
+
+
+}
