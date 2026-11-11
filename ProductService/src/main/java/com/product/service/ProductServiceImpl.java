@@ -4,6 +4,7 @@ import com.product.Client.InventoryClient;
 import com.product.cache.ProductCache;
 import com.product.dto.request.ProductRequest;
 import com.product.dto.request.RestockRequest;
+import com.product.dto.response.ProductBasicInfo;
 import com.product.dto.response.ProductResponse;
 import com.product.entity.Product;
 import com.product.exception.ProductNotFoundException;
@@ -14,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +88,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public boolean DoesProductExistBySeller(UUID productId, UUID sellerId) {
+        return productRepository.existsByIdAndSellerId(productId, sellerId);
+    }
+
+    @Override
     @Transactional
     public ProductResponse updateProduct(UUID productId, UUID sellerId, ProductRequest request , String imageUrl) {
         Product product = fetchProduct(productId, sellerId);
@@ -130,24 +133,24 @@ public class ProductServiceImpl implements ProductService {
         return ProductResponse.fromEntity(product, 0, 0);
     }
 
-    @Override
-    public String getProductNameByProductId(UUID productId) {
-        Product product =  productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("product Not found"));
-        return product.getName();
-    }
-
 
 
     @Override
-    public String getProductImageByProductId(UUID productId) {
-        Product product =  productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("product Not found"));
-        return product.getImageUrl();
-    }
+    public Map<UUID, ProductBasicInfo> getProductBasicInfo(List<UUID> productIds) {
+       Map<UUID, ProductBasicInfo> response = new HashMap<>();
 
-    @Override
-    public Product findProductByIdOrThrow(UUID productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Product is not Available!!"));
+       for(UUID productId: productIds) {
+           Product product = productRepository.findById(productId)
+                   .orElseThrow(() -> new ProductNotFoundException("Product is not Available!!"));
+
+           response.put(productId, ProductBasicInfo.builder()
+                   .imageUrl(product.getImageUrl())
+                   .productName(product.getName())
+                   .productId(product.getId())
+                   .unitPrice(product.getPrice())
+                   .build());
+       }
+       return response;
     }
 
     @Override

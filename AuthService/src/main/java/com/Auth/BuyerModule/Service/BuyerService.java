@@ -3,6 +3,7 @@ package com.Auth.BuyerModule.Service;
 
 import com.Auth.BuyerModule.DTO.Request.AddAddressRequest;
 import com.Auth.BuyerModule.DTO.Request.BuyerProfileUpdateRequest;
+import com.Auth.BuyerModule.DTO.Request.CheckoutRequest;
 import com.Auth.BuyerModule.DTO.Response.AddAddressResponse;
 import com.Auth.BuyerModule.DTO.Response.BuyerProfileResponse;
 import jakarta.validation.Valid;
@@ -28,4 +29,6 @@ public interface BuyerService {
     void updateAddress(UUID id, UUID addId, @Valid AddAddressRequest newAddress);
 
     BuyerProfileResponse getBuyerProfile(UUID id, String email);
+
+    String fetchCartAndAddressForCheckout(UUID buyerId, @Valid CheckoutRequest request);
 }

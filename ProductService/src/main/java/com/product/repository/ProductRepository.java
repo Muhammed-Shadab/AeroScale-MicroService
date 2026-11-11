@@ -25,4 +25,5 @@ public interface ProductRepository extends JpaRepository<Product, UUID> , JpaSpe
 
     Page<Product> findByStatus(Product.ProductStatus status, Pageable pageable);
 
+    boolean existsByIdAndSellerId(UUID id, UUID sellerId);
 }

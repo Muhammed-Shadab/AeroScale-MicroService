@@ -3,6 +3,7 @@ package com.product.controller;
 
 import com.product.dto.request.ProductRequest;
 import com.product.dto.request.RestockRequest;
+import com.product.dto.response.ProductBasicInfo;
 import com.product.dto.response.ProductResponse;
 import com.product.entity.Product;
 import com.product.service.ImageUploadService;
@@ -14,12 +15,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -120,6 +124,17 @@ public class ProductController {
     @GetMapping("/IsProductExist/{productId}")
     private boolean doesProductExist(@PathVariable UUID productId) {
         return productService.DoesProductExist(productId);
+    }
+
+    @GetMapping("/IsProductExistBySellerId/{productId}")
+    private ResponseEntity<Boolean> doesProductExist(@PathVariable UUID productId,
+                                     @AuthenticationPrincipal(expression = "id") UUID sellerId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.DoesProductExistBySeller(productId,sellerId));
+    }
+
+    @GetMapping("/productBasicInfo")
+    private ResponseEntity<Map<UUID, ProductBasicInfo>> getProductBasicInfo(@RequestBody List<UUID> productIds ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.getProductBasicInfo(productIds));
     }
 //    @GetMapping("/testing")
 //    public String exceptionTesting() {

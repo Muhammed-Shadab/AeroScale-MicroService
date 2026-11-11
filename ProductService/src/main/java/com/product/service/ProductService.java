@@ -2,6 +2,7 @@ package com.product.service;
 
 import com.product.dto.request.ProductRequest;
 import com.product.dto.request.RestockRequest;
+import com.product.dto.response.ProductBasicInfo;
 import com.product.dto.response.ProductResponse;
 import com.product.entity.Product;
 import jakarta.validation.Valid;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface ProductService {
@@ -27,11 +29,8 @@ public interface ProductService {
     // Internal cross-module method for Order module
     ProductResponse getProductForCheckout(UUID productId);
 
-    String getProductNameByProductId(UUID productId);
 
-    String getProductImageByProductId(UUID productId);
-
-    Product findProductByIdOrThrow(UUID productId);
+    Map<UUID, ProductBasicInfo> getProductBasicInfo(List<UUID> productId);
 
     List<ProductResponse> getProductsByIds(Collection<UUID> productIds);
 
@@ -40,4 +39,6 @@ public interface ProductService {
     boolean DoesProductExist(UUID productId);
 
     void restockProduct(UUID productId,RestockRequest request, UUID sellerId);
+
+    boolean DoesProductExistBySeller(UUID productId, UUID sellerId);
 }

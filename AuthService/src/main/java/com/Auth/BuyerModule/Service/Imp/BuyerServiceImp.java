@@ -2,10 +2,14 @@ package com.Auth.BuyerModule.Service.Imp;
 
 import com.Auth.BuyerModule.DTO.Request.AddAddressRequest;
 import com.Auth.BuyerModule.DTO.Request.BuyerProfileUpdateRequest;
+import com.Auth.BuyerModule.DTO.Request.CheckoutRequest;
 import com.Auth.BuyerModule.DTO.Response.AddAddressResponse;
 import com.Auth.BuyerModule.DTO.Response.BuyerProfileResponse;
+import com.Auth.BuyerModule.DTO.Response.CartResponse;
 import com.Auth.BuyerModule.Entity.Buyer;
 import com.Auth.BuyerModule.Entity.BuyerAddress;
+import com.Auth.BuyerModule.Service.CartService;
+import com.Auth.Exceptions.BuyerException.EmptyCartException;
 import com.Auth.Exceptions.BuyerException.RequiredThingsNotFoundException;
 import com.Auth.BuyerModule.Repository.BuyerAddressRepository;
 import com.Auth.BuyerModule.Repository.BuyerRepository;
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,6 +31,7 @@ public class BuyerServiceImp implements BuyerService {
 
     private final BuyerRepository buyerRepository;
     private final BuyerAddressRepository buyerAddressRepository;
+    private final CartService cartService;
 
     @Override
     @Transactional
@@ -67,7 +73,6 @@ public class BuyerServiceImp implements BuyerService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public AddAddressResponse getBuyerAddressForCheckout(UUID buyerId, UUID addressId) {
         BuyerAddress address = buyerAddressRepository.findById(addressId)
                 .orElseThrow(() -> new RequiredThingsNotFoundException("Shipping address not found"));
@@ -133,6 +138,25 @@ public class BuyerServiceImp implements BuyerService {
                 .walletBalance(buyer.getWalletBalance())
                 .id(buyer.getId())
                 .build();
+    }
+
+    @Override
+    public String fetchCartAndAddressForCheckout(UUID buyerId, CheckoutRequest request) {
+//        Optional<Orders> existingOrder = orderRepository.findByIdempotencyKey(request.idempotencyKey());
+//        if (existingOrder.isPresent()) {
+//            return OrderResponse.fromEntity(existingOrder.get(), paymentService.getRazorPayOrderId(existingOrder.get().getId()), key, null);
+//        }
+
+        // 2. Fetch Cart
+        List<CartResponse> cartItems = cartService.getAllCarts(buyerId);
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new EmptyCartException("Cannot place an order with an empty cart");
+        }
+
+
+        AddAddressResponse address = getBuyerAddressForCheckout(buyerId, request.shippingAddressId());
+
+
     }
 
     private BuyerAddress findAddressByBuyerOrThrow(UUID addId, UUID id) {
