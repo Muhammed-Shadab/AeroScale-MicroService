@@ -31,6 +31,9 @@ public class OrderItem {
     private UUID productId;
 
     @Column(nullable = false, updatable = false)
+    private UUID sellerId;
+
+    @Column(nullable = false, updatable = false)
     private Integer quantity;
 
     @Column(nullable = false, precision = 12, scale = 2, updatable = false)

@@ -18,9 +18,7 @@ import com.Order.repository.OrderItemRepository;
 import com.Order.repository.OrderRepository;
 import com.Order.service.OrderService;
 
-import io.netty.channel.AdaptiveRecvByteBufAllocator;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.Order;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -40,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
     private String key;
 
     private final OrderRepository orderRepository;
-//    private final FlashSaleService flashSaleService;
     private final OrderItemRepository orderItemRepository;
 
     private final BuyerClient buyerClient;
@@ -101,19 +98,20 @@ public class OrderServiceImpl implements OrderService {
             list.add(new ProductIdAndStockToReserv(cartItem.getProductId(), cartItem.getItemCount()));
         }
 
+        //here we are supppose to update the redis
+        // and get the product info so that we can create the order items with seller id etc
+
         ReserveStock reserveStock = ReserveStock.builder()
                 .productInfoList(list)
                 .orderId(orderId.toString())
                 .build();
 
+        //first publish the event a
         inventoryClient.updateStocks(reserveStock);
-        Map<UUID, ProductInfo> prices = productClient.getProductInfo(productIds);
 
-
-        // 5. Process Items: Fetch Price & Reserve Stock
         for (CartInfo cartItem : cartItems) {
 
-            BigDecimal unitPrice = prices.get(cartItem.getProductId()).getUnitPrice();
+            BigDecimal unitPrice = cartItem.getPricePerItem();
 
             BigDecimal subTotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getItemCount()));
 
@@ -150,24 +148,20 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("Only PENDING orders can be cancelled");
         }
 
-
-        // Loop through the items and tell the vault to release the locks
-
         for (OrderItem item : order.getOrderItems()) {
             item.setStatus(OrderItem.OrderItemStatus.CANCELLED);
-            inventoryService.releaseStock(orderId, item.getProductId());
         }
 
-
-        // Mark as cancelled and save
         order.setStatus(Orders.OrderStatus.CANCELLED);
+
+        inventoryClient.releaseStock(orderId);
 
         orderRepository.save(order);
     }
 
     @Override
     @Transactional
-    public void confirmOrderPayment(UUID orderId, UUID buyerId) {
+    public void confirmOrder(UUID orderId, UUID buyerId) {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -177,13 +171,12 @@ public class OrderServiceImpl implements OrderService {
 
         // Tell the Vault to permanently deduct the physical stock
         for (OrderItem item : order.getOrderItems()) {
-            inventoryService.confirmStock(orderId, item.getProductId());
-            // sale ACTIVE hai to "claimed" bar badhao
-            flashSaleService.recordSale(item.getProductId(), item.getQuantity());
             item.setStatus(OrderItem.OrderItemStatus.CONFIRMED);
         }
 
         order.setStatus(Orders.OrderStatus.CONFIRMED);
+
+        inventoryClient.confirmStock(orderId);
         orderRepository.save(order);
     }
 
@@ -295,47 +288,6 @@ public class OrderServiceImpl implements OrderService {
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-    @Override
-    @Transactional
-    public void createOrderForFlashSale(FlashSaleProductDetails productDetails, UUID buyerId, UUID orderId) {
-
-        AddressInfo addressResponse = buyerClient.getBuyerAddressForCheckout(productDetails.getShippingAddressId());
-
-        OrderAddress snapshotAddress = OrderAddress.builder()
-                .recipientName(addressResponse.getRecipientName())
-                .recipientPhoneNo(addressResponse.getRecipientPhoneNo())
-                .addressLine1(addressResponse.getAddressLine1())
-                .addressLine2(addressResponse.getAddressLine2())
-                .city(addressResponse.getCity())
-                .state(addressResponse.getState())
-                .pincode(addressResponse.getPincode())
-                .country(addressResponse.getCountry())
-                .build();
-
-
-        Orders order = Orders.builder()
-                .id(orderId)
-                .buyerId(buyerId)
-                .idempotencyKey("It Is Deprecated")
-                .shippingAddressSnapshot(snapshotAddress)
-                .status(Orders.OrderStatus.PENDING)
-                .totalAmount(productDetails.getTotalPrice())
-                .build();
-
-
-        OrderItem orderItem = OrderItem.builder()
-                .productId(productDetails.getProductId())
-                .quantity(productDetails.getQuantity())
-                .unitPriceAtPurchase(productDetails.getTotalPrice().divide(BigDecimal.valueOf(productDetails.getQuantity())))
-                .subTotal(productDetails.getTotalPrice())
-                .isFlashSaleProduct(true)
-                .build();
-
-        orderRepository.save(order);
-        orderItemRepository.save(orderItem);
-    }
-
     @Override
     public List<OrderItem> getOrdersOfThisDuration(Instant start, Instant end, UUID id) {
         return orderItemRepository.getOrOrderItemsBetweenThisDuration(id, start, end);

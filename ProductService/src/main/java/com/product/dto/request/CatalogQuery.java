@@ -1,5 +1,6 @@
 package com.product.dto.request;
 
+import com.product.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ public class CatalogQuery {
     private String q;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
+    private Product.ProductStatus status;
 }
 
 

@@ -20,18 +20,16 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, UUID> {
     @Query("""
     SELECT oi
     FROM OrderItem oi
-    JOIN Product p ON oi.productId = p.id
-    WHERE (oi.status <> 'PENDING' OR oi.status = :status)
-      AND p.sellerId = :id
+    WHERE (oi.status <> 'PENDING' AND (:status IS NULL OR oi.status = :status ))
+      AND oi.sellerId = :id
     """)
     Page<OrderItem> findOrdersOfSeller(UUID id, OrderItem.OrderItemStatus status, Pageable pageable);
 
 
     @Query("""
         SELECT oi FROM OrderItem oi
-        JOIN Product p ON oi.productId = p.id
         WHERE oi.createdAt BETWEEN :start AND :end
-        AND p.sellerId = :id
+        AND oi.sellerId = :id
         """)
     List<OrderItem> getOrOrderItemsBetweenThisDuration(UUID id, Instant start, Instant end);
 }

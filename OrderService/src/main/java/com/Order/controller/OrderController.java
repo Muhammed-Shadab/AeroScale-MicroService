@@ -83,5 +83,12 @@ public class OrderController {
     }
 
 
+    @PutMapping("/confirmOrderPayment")
+    public ResponseEntity<?> confirmOrderPayment(UUID orderId, @AuthenticationPrincipal(expression = "id") UUID buyerid) {
+        orderService.confirmOrder(orderId, buyerid);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Order Confirmed SuccessFully");
+    }
+
+
 
 }

@@ -11,8 +11,9 @@ import java.time.Instant;
 public final class ProductSpecs {
     private ProductSpecs() {}
 
-    public static Specification<Product> active() {
-        return (root, query, cb) -> cb.equal(root.get("status"), Product.ProductStatus.ACTIVE);
+    public static Specification<Product> withStatus(Product.ProductStatus status) {
+        return (root, query, cb) -> cb.equal(root.get("status"),
+                (status == null) ? Product.ProductStatus.ACTIVE: status);
     }
 
     public static Specification<Product> textContains(String q) {

@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class InventoryClient {
@@ -17,6 +19,20 @@ public class InventoryClient {
         restClient.post()
                 .uri(base + "/api/inv/updateStock")
                 .body(stock)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void releaseStock(UUID orderId) {
+        restClient.delete()
+                .uri(base + "/api/inv/releaseStock/{orderId}", orderId)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void confirmStock(UUID orderId) {
+        restClient.put()
+                .uri(base + "/api/inv/confirmStock/{orderId}", orderId)
                 .retrieve()
                 .toBodilessEntity();
     }

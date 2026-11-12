@@ -5,6 +5,7 @@ import com.product.entity.Product;
 import com.product.entity.Product.ProductStatus;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 public record CatalogResponse(
@@ -14,7 +15,10 @@ public record CatalogResponse(
         BigDecimal price,
         ProductStatus status,
         String imageUrl,
-        Integer availableStock
+        Integer availableStock,
+        Integer maxItemPerUser,
+        Instant startTime,
+        Instant endTime
 ) {
     public static CatalogResponse fromEntity(Product p, Integer availableStock) {
         return new CatalogResponse(
@@ -24,7 +28,10 @@ public record CatalogResponse(
                 p.getPrice(),
                 p.getStatus(),
                 p.getImageUrl(),
-                availableStock
+                availableStock,
+                p.getMaxItemsPerUser(),
+                p.getStartTime(),
+                p.getEndTime()
         );
     }
 }

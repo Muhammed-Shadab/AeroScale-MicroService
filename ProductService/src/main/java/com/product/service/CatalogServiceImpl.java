@@ -35,10 +35,11 @@ public class CatalogServiceImpl implements CatalogService {
     @Override
     @Transactional(readOnly = true)
     public Page<CatalogResponse> searchProducts(CatalogQuery query, Pageable pageable) {
-        Specification<Product> spec = ProductSpecs.active();
+        Specification<Product> spec = ProductSpecs.withStatus(query.getStatus());
         if (query.getQ() != null && !query.getQ().isBlank()) spec = spec.and(ProductSpecs.textContains(query.getQ()));
         if (query.getMinPrice() != null) spec = spec.and(ProductSpecs.priceAtLeast(query.getMinPrice()));
         if (query.getMaxPrice() != null) spec = spec.and(ProductSpecs.priceAtMost(query.getMaxPrice()));
+
 
         Page<Product> page = productRepository.findAll(spec, pageable);
         List<Product> products = page.getContent();

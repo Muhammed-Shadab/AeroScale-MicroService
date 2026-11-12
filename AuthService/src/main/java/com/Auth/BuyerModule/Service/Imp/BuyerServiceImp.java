@@ -139,25 +139,25 @@ public class BuyerServiceImp implements BuyerService {
                 .id(buyer.getId())
                 .build();
     }
-
-    @Override
-    public String fetchCartAndAddressForCheckout(UUID buyerId, CheckoutRequest request) {
-//        Optional<Orders> existingOrder = orderRepository.findByIdempotencyKey(request.idempotencyKey());
-//        if (existingOrder.isPresent()) {
-//            return OrderResponse.fromEntity(existingOrder.get(), paymentService.getRazorPayOrderId(existingOrder.get().getId()), key, null);
+//
+//    @Override
+//    public String fetchCartAndAddressForCheckout(UUID buyerId, CheckoutRequest request) {
+////        Optional<Orders> existingOrder = orderRepository.findByIdempotencyKey(request.idempotencyKey());
+////        if (existingOrder.isPresent()) {
+////            return OrderResponse.fromEntity(existingOrder.get(), paymentService.getRazorPayOrderId(existingOrder.get().getId()), key, null);
+////        }
+//
+//        // 2. Fetch Cart
+//        List<CartResponse> cartItems = cartService.getAllCarts(buyerId);
+//        if (cartItems == null || cartItems.isEmpty()) {
+//            throw new EmptyCartException("Cannot place an order with an empty cart");
 //        }
-
-        // 2. Fetch Cart
-        List<CartResponse> cartItems = cartService.getAllCarts(buyerId);
-        if (cartItems == null || cartItems.isEmpty()) {
-            throw new EmptyCartException("Cannot place an order with an empty cart");
-        }
-
-
-        AddAddressResponse address = getBuyerAddressForCheckout(buyerId, request.shippingAddressId());
-
-
-    }
+//
+//
+//        AddAddressResponse address = getBuyerAddressForCheckout(buyerId, request.shippingAddressId());
+//
+//
+//    }
 
     private BuyerAddress findAddressByBuyerOrThrow(UUID addId, UUID id) {
         return buyerAddressRepository.findByIdAndBuyerId(addId, id)

@@ -22,7 +22,10 @@ public record ProductResponse(
         Instant createdAt,
         Instant updatedAt,
         int totalStock,
-        int availableStock
+        int availableStock,
+        Instant startTime,
+        Instant endTime,
+        Integer maxItemPerUser
 ) {
     public static ProductResponse fromEntity(Product product, int totalStock, int availableStock) {
         return new ProductResponse(
@@ -36,7 +39,10 @@ public record ProductResponse(
                 product.getCreatedAt(),
                 product.getUpdatedAt(),
                 totalStock,
-                availableStock
+                availableStock,
+                product.getStartTime(),
+                product.getEndTime(),
+                product.getMaxItemsPerUser()
         );
     }
 }

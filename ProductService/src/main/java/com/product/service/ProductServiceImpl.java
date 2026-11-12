@@ -35,6 +35,9 @@ public class ProductServiceImpl implements ProductService {
                 .price(request.price())
                 .imageUrl(imageUrl)
                 .status(request.status())
+                .startTime(request.startTime())
+                .endTime(request.endTime())
+                .maxItemsPerUser(request.maxItemPerUser())
                 .build();
         Product savedProduct = productRepository.save(product);
         inventoryClient.initializeInventory(savedProduct.getId());
@@ -101,6 +104,8 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(request.description());
         product.setPrice(request.price());
         product.setStatus(request.status());
+        product.setEndTime(request.endTime());
+        product.setMaxItemsPerUser(request.maxItemPerUser());
 
         if (imageUrl != null) product.setImageUrl(imageUrl); // agar new img ayegi toh hi updte wnra no update
 
@@ -115,7 +120,8 @@ public class ProductServiceImpl implements ProductService {
         Product product = fetchProduct(productId, sellerId);
 
         // IMP : DO NOT DO HARD DELETE.WE DO Soft delete: Change status to ARCHIVED.
-        product.setStatus(Product.ProductStatus.ARCHIVED);
+        if(product.getStatus().toString().equals("ACTIVE") || product.getStatus().toString().equals("SCHEDULED"))
+            product.setStatus(Product.ProductStatus.CANCELLED);
 
         productRepository.save(product);
     }

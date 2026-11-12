@@ -44,14 +44,35 @@ public class Product {
     @Column(nullable = false)
     private Instant updatedAt;
 
+
+    @Column(nullable = false)
+    private Instant startTime;
+
+    @Column(nullable = false)
+    private Instant endTime;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer maxItemsPerUser = 4;
+
+    // sale ke dauran buyer jo price dega
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal salePrice;
+
+    // is sale ke liye alag rakhi gayi units
+    @Column(nullable = false)
+    private Integer totalQuantity;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer soldQuantity = 0;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private ProductStatus status = ProductStatus.DRAFT; // Default is DRAFT
+    private ProductStatus status = ProductStatus.SCHEDULED; // Default is DRAFT
 
     public enum ProductStatus {
-        DRAFT,
-        ACTIVE,
-        ARCHIVED
+        SCHEDULED, ACTIVE, ENDED, CANCELLED
     }
 
     @PrePersist

@@ -1,8 +1,6 @@
 package com.Order.service;
 
 import com.Order.dto.request.CheckoutRequest;
-import com.Order.dto.request.FlashSaleProductDetails;
-import com.Order.dto.response.OrderResponse;
 import com.Order.dto.response.OrdersResponseOfBuyer;
 import com.Order.dto.response.SellerOrderResponse;
 import com.Order.entity.OrderItem;
@@ -22,15 +20,13 @@ public interface OrderService {
     void cancelOrder(UUID buyerId, UUID orderId);
 
     // Simulates a successful payment webhook : we do not have a payment service right now, for now we just simulate.
-    void confirmOrderPayment(UUID orderId, UUID id);
+    void confirmOrder(UUID orderId, UUID id);
 
     OrdersResponseOfBuyer getOrderOfBuyer(UUID id, Pageable pageable,  Orders.OrderStatus status);
 
     List<SellerOrderResponse> getOrderRelatedToSeller(UUID id, int page, int size, OrderItem.OrderItemStatus status);
 
     ResponseEntity<?> updateOrderStatus(UUID id, UUID orderId);
-
-    void createOrderForFlashSale(FlashSaleProductDetails productDetails, UUID BuyerId, UUID orderId);
 
     List<OrderItem> getOrdersOfThisDuration(Instant start, Instant end, UUID id);
 }

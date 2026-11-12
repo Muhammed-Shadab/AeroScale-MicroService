@@ -77,15 +77,15 @@ public class BuyerController {
     }
 
 
-    @PostMapping("/checkout")
-    @PreAuthorize("hasRole('BUYER')")
-    public ResponseEntity<String> checkout(
-            @Valid @RequestBody CheckoutRequest request,
-            @AuthenticationPrincipal(expression = "id") UUID buyerId){
-
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(buyerService.fetchCartAndAddressForCheckout(buyerId, request));
-    }
+//    @PostMapping("/checkout")
+//    @PreAuthorize("hasRole('BUYER')")
+//    public ResponseEntity<String> checkout(
+//            @Valid @RequestBody CheckoutRequest request,
+//            @AuthenticationPrincipal(expression = "id") UUID buyerId){
+//
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(buyerService.fetchCartAndAddressForCheckout(buyerId, request));
+//    }
 
 
 }

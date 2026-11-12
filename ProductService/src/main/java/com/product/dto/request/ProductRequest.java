@@ -3,7 +3,10 @@ package com.product.dto.request;
 import com.product.entity.Product.ProductStatus;
 import jakarta.validation.constraints.*;
 
+
+
 import java.math.BigDecimal;
+import java.time.Instant;
 
 
 public record ProductRequest(
@@ -19,9 +22,18 @@ public record ProductRequest(
         @DecimalMin(value = "0.01", message = "Price must be strictly greater than 0")
         BigDecimal price,
 
-
         @NotNull(message = "Product status is required")
-        ProductStatus status
+        ProductStatus status,
 
+        @NotNull(message = "Please Mention the start time")
+        Instant startTime,
+
+        @NotNull(message = "Please Mention the end time")
+        @Future(message = "End Time should be Greater then the current time")
+        Instant endTime,
+
+        @NotNull(message = "Max Item Per User cannot me empty")
+        @Min(value = 1, message = "Max Item Per User should be greater then 0")
+        Integer maxItemPerUser
 ) {}
 

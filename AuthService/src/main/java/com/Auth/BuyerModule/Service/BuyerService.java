@@ -30,5 +30,5 @@ public interface BuyerService {
 
     BuyerProfileResponse getBuyerProfile(UUID id, String email);
 
-    String fetchCartAndAddressForCheckout(UUID buyerId, @Valid CheckoutRequest request);
+    //String fetchCartAndAddressForCheckout(UUID buyerId, @Valid CheckoutRequest request);
 }
