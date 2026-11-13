@@ -2,10 +2,11 @@ package com.Auth.SellerModule.Service.Impl;
 
 
 import com.Auth.BuyerModule.DTO.Request.ProductDetails;
-import com.Auth.Exceptions.BuyerException.RequiredThingsNotFoundException;
 import com.Auth.Client.OrderClient;
 import com.Auth.Client.ProductClient;
+import com.Auth.Exceptions.BuyerException.RequiredThingsNotFoundException;
 import com.Auth.SellerModule.DTO.Request.UpdateProfileRequest;
+import com.Auth.SellerModule.DTO.Request.UpdateSellerMetricsRequest;
 import com.Auth.SellerModule.DTO.Response.*;
 import com.Auth.SellerModule.Entity.Seller;
 import com.Auth.SellerModule.Repository.SellerRepository;
@@ -21,6 +22,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -157,6 +160,37 @@ public class SellerServiceImpl implements SellerService {
                 .build();
 
         return response;
+    }
+
+    @Override
+    @Transactional
+    public void batchUpdateRevenueAndFulfilled(List<UpdateSellerMetricsRequest> updates) {
+        if (updates == null || updates.isEmpty()) return;
+
+        // 1. Saare seller IDs
+        List<UUID> sellerIds = updates.stream()
+                .map(UpdateSellerMetricsRequest::getSellerId)
+                .toList();
+
+        // 2. Single DB Query me saare sellers fetch
+        List<Seller> sellers = sellerRepository.findAllById(sellerIds);
+        Map<UUID, Seller> sellerMap = sellers.stream()
+                .collect(Collectors.toMap(Seller::getId, Function.identity()));
+
+        // 3. In-memory update
+        for (UpdateSellerMetricsRequest update : updates) {
+            Seller seller = sellerMap.get(update.getSellerId());
+            if (seller != null) {
+                if (update.getRevenue() != null) {
+                    seller.setTotalRevenew(seller.getTotalRevenew().add(update.getRevenue()));
+                }
+                if (update.getFulfilledCount() != null) {
+                    seller.setTotalOrdersFullFilled(seller.getTotalOrdersFullFilled() + update.getFulfilledCount());
+                }
+            }
+        }
+
+        sellerRepository.saveAll(sellers);
     }
 
     public List<TopProductsAnalytics> getTopProductsForAnalytics(List<OrderItemResponse> orderItemList) {

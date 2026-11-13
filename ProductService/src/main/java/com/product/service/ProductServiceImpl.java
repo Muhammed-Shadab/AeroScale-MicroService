@@ -5,16 +5,19 @@ import com.product.cache.ProductCache;
 import com.product.dto.request.ProductRequest;
 import com.product.dto.request.RestockRequest;
 import com.product.dto.response.ProductBasicInfo;
+import com.product.dto.response.ProductBatchInfo;
 import com.product.dto.response.ProductResponse;
 import com.product.entity.Product;
 import com.product.exception.ProductNotFoundException;
 import com.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -176,6 +179,34 @@ public class ProductServiceImpl implements ProductService {
         }
         return res;
 
+    }
+
+    /**
+     * Retrieves product batch info including seller ID and effective sale price.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, ProductBatchInfo> getProductBatchInfo(List<UUID> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return Map.of();
+        }
+
+        List<Product> products = productRepository.findAllById(productIds);
+        Map<UUID, ProductBatchInfo> response = new HashMap<>();
+
+        for (Product product : products) {
+            BigDecimal effectivePrice = product.getSalePrice() != null
+                    ? product.getSalePrice()
+                    : product.getPrice();
+
+            response.put(product.getId(), ProductBatchInfo.builder()
+                    .productId(product.getId())
+                    .sellerId(product.getSellerId())
+                    .salePrice(effectivePrice)
+                    .build());
+        }
+
+        return response;
     }
 
 

@@ -4,6 +4,7 @@ package com.product.controller;
 import com.product.dto.request.ProductRequest;
 import com.product.dto.request.RestockRequest;
 import com.product.dto.response.ProductBasicInfo;
+import com.product.dto.response.ProductBatchInfo;
 import com.product.dto.response.ProductResponse;
 import com.product.entity.Product;
 import com.product.service.ImageUploadService;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -132,10 +132,20 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.DoesProductExistBySeller(productId,sellerId));
     }
 
+    /**
+     * Internal endpoint for cross-service batch product lookup.
+     */
+    @PostMapping("/internal/batch")
+    public ResponseEntity<Map<UUID, ProductBatchInfo>> getProductBatchInfo(@RequestBody List<UUID> productIds) {
+        return ResponseEntity.ok(productService.getProductBatchInfo(productIds));
+    }
+
     @GetMapping("/productBasicInfo")
     private ResponseEntity<Map<UUID, ProductBasicInfo>> getProductBasicInfo(@RequestBody List<UUID> productIds ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.getProductBasicInfo(productIds));
     }
+
+
 //    @GetMapping("/testing")
 //    public String exceptionTesting() {
 //

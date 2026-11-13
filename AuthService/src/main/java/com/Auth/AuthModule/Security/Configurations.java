@@ -39,6 +39,7 @@ public class Configurations {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/register", "/api/auth/login",
                                 "/api/auth/refreshToken", "/api/auth/test", "/temp.html", "/error").permitAll()
+                        .requestMatchers("/api/seller/internal/**").permitAll()
                         .requestMatchers("/api/buyer/**").hasRole("BUYER")
                         .requestMatchers("/api/cart/**").hasRole("BUYER")
                         .requestMatchers("/api/v1/flash-sales/**").hasRole("SELLER")

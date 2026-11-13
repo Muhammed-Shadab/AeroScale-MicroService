@@ -3,9 +3,9 @@ package com.product.service;
 import com.product.dto.request.ProductRequest;
 import com.product.dto.request.RestockRequest;
 import com.product.dto.response.ProductBasicInfo;
+import com.product.dto.response.ProductBatchInfo;
 import com.product.dto.response.ProductResponse;
 import com.product.entity.Product;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -41,4 +41,9 @@ public interface ProductService {
     void restockProduct(UUID productId,RestockRequest request, UUID sellerId);
 
     boolean DoesProductExistBySeller(UUID productId, UUID sellerId);
+
+    /**
+     * Batch fetch seller ID and sale price for given product IDs.
+     */
+    Map<UUID, ProductBatchInfo> getProductBatchInfo(List<UUID> productIds);
 }
