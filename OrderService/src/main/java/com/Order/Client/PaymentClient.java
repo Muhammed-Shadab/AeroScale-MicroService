@@ -1,14 +1,11 @@
 package com.Order.Client;
 
 import com.Order.dto.request.OrderDetails;
-import com.Order.dto.request.ProductInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestClient;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,7 +15,7 @@ import java.util.UUID;
 public class PaymentClient {
 
     private final RestClient restClient;
-    private final String base = "http://localhost:8080";
+    private final String base = "http://localhost:8084";
 
 
     public Map<UUID, String> getRzrPayOrderId(List<String> orderIds) {

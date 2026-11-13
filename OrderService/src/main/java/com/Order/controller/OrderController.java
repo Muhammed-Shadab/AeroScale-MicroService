@@ -1,7 +1,6 @@
 package com.Order.controller;
 
 import com.Order.dto.request.CheckoutRequest;
-import com.Order.dto.response.OrderResponse;
 import com.Order.dto.response.OrdersResponseOfBuyer;
 import com.Order.dto.response.SellerOrderResponse;
 import com.Order.entity.OrderItem;
@@ -83,10 +82,12 @@ public class OrderController {
     }
 
 
-    @PutMapping("/confirmOrderPayment")
-    public ResponseEntity<?> confirmOrderPayment(UUID orderId, @AuthenticationPrincipal(expression = "id") UUID buyerid) {
-        orderService.confirmOrder(orderId, buyerid);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Order Confirmed SuccessFully");
+    @PutMapping("/internal/confirm/{orderId}")
+    public ResponseEntity<Void> confirmOrderInternal(
+            @PathVariable UUID orderId,
+            @RequestParam UUID buyerId) {
+        orderService.confirmOrder(orderId, buyerId);
+        return ResponseEntity.ok().build();
     }
 
 
